@@ -1,0 +1,98 @@
+git clone https://github.com/fran1990/cxt
+
+
+
+**** Commits de prueba *****
+	git add horario.pdf               ** Añadir cambios al index **
+	git commit -m "horario clase"     ** Hacer el commit de los cambios **
+	git push -u origin master         ** Enviar los cambios al repositorio **
+
+	git add Practica4.txt
+	git commit -m "practica entregable"
+	git push -u origin master
+
+
+**** Práctica de prueba para el git ****
+
+** 4º commit (Crear proyecto)**
+	git add .
+	git commit -m "Inicio del proyecto"
+	git push -u origin master
+
+** 5º commit (Borrar archivos de prueba) **
+	git add -u
+	git commit -m "Borrado de archivos de prueba"
+	git push -u origin master
+
+*** Creación de una nueva branch ***
+	git branch other-branch
+	git checkout other-branch
+
+** 6º commit **
+	git add .
+	git commit -m "Archivos de musica y imagenes de muestra subidos"
+	git push -u origin other-branch
+
+** 7º commit **
+	git add .
+	git commit -m "Eleccion aleatoria de imagenes"
+	git push -u origin other-branch
+
+** 8º commit **
+	git add .
+	git commit -m "Eleccion aleatoria de canciones"
+	git push -u origin other-branch
+
+**** Cambiar a la rama master ****
+	git checkout master
+
+** 9º commit **
+	git add .
+	git commit -m "Creacion usuarios"
+	git push -u origin master
+
+** 10º commit **
+	git add .
+	git commit -m "Creacion carpetas home"
+	git push -u origin master
+
+**** Fusion de ramas ****
+	git merge other-branch
+**** Corregir errores a mano ****
+	git add proyecto/script.sh
+	git add proyecto/info.txt
+**** Hacer el commit y subirlo ****
+	git commit -m "Fusión de las ramas"
+	git push -u origin master
+
+
+
+** commit después del merge **
+	git add .
+	git commit -m "Mover imagenes y canciones"
+	git push -u origin master
+
+** commit para subir este txt **
+	git add .
+	git commit -m "Fichero de procedimiento de prueba del git"
+	git push -u origin master
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
