@@ -8,3 +8,7 @@ El script busca imagenes en la carpeta de imagenes de muestra y elige una aleato
 y la guarda en una carpeta personal de imagenes para cada usuario que previamente creamos.
 
 El script ahora también busca canciones en la carpeta de musica de meustra y elige una aleatoria para cada usuario y la guarda en una carpeta persona de musica para cada usuario que previamente creamos.
+
+
+Creamos als carpetas imagenes y musica dentro del directorio home de cada usuario y copiamos en las carpetas
+la imagen y la canción que le corresponde a cada usuario según la elección aleatoria previa.

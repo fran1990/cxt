@@ -10,6 +10,8 @@ for user in $USERS
 do
 	useradd $user 2>/dev/null
 	mkdir /home/$user 2>/dev/null
+	mkdir /home/$user/imagenes
+	mkdir /home/$user/musica
 done
 
 imagenes=( ./Muestra/Imagenes/*.jpg )
@@ -32,6 +34,11 @@ do
 	cp "$randomfile" ./musica/$i
 done
 
+for i in $USERS
+do
+	cp ./imagenes/$i/* /home/$i/imagenes
+	cp ./musica/$i/* /home/$i/musica
+done
 
 
 
