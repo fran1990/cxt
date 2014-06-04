@@ -1,0 +1,395 @@
+
+
+1)  
+
+   a) 
+      cd C:\Archivos de programa\OpenSSH\bin
+      ssh lsi@10.10.102.236
+
+   b)
+     # Copiar un fichero en local de una máquina remota WINDOWS
+        scp lsi@10.10.102.236:/home/lsi/archivoPrueba.txt \Users\Fran\Desktop
+        scp lsi@10.10.102.236:/home/lsi/archivoPrueba.txt /cygdrive/c/Users/Fran/Desktop
+
+     # Utilizando encriptación específica
+      -c cypher_spec
+      Nos permite elegir la técnica de cifrado a usar para encriptar la transferencia de datos. Si estamos usando la versión 1 del protocolo, podemos usar: ‘3des‘, ‘blowfish‘ y ‘des‘. 3Des (triple-des) es una triple encriptación-desencriptación que usa 3 llaves diferentes. Blowfish es un codificador de bloques simétricos, muy seguro y bastante más rápido que 3des.
+
+	WINDOWS
+        scp -c 3des lsi@10.10.102.236:/home/lsi/archivoPrueba.txt /cygdrive/c/Users/Fran/Desktop
+        scp -c blowfish lsi@10.10.102.236:/home/lsi/archivoPrueba.txt /cygdrive/c/Users/Fran/Desktop
+
+	LINUX
+        scp -c 3des lsi@10.10.102.236:/home/lsi/archivoPrueba.txt /home/Fran/Escritorio
+        scp -c blowfish lsi@10.10.102.236:/home/lsi/archivoPrueba.txt /home/Fran/Escritorio
+       
+
+    c)
+	Generar la clave en el cliente:
+            # ssh-keygen -t dsa
+        Compartir la clave pública:
+        La clave pública debe ser incluida en el fichero $HOME/.ssh/authorized_keys2 de cada máquina en la que 
+        deseemos utilizar la autenticación por clave pública.
+        Para realizar este intercambio podemos utilizar directamente el ssh desde la máquina en que hemos generado nuestra clave.
+           # ssh usuario@servidor.dominio.es 'cat >> .ssh/authorized_keys2' < id_dsa.pub
+
+
+
+    d)
+
+
+	# ssh -L 8080:10.10.102.236:80 lsi@10.10.102.236 
+        # ssh -R 8080:localhost:80 lsi@10.10.102.236
+	http://localhost:8080/
+
+
+	#ssh -L 666:servidor:1666 user@servidor 	fordwardign de mi puerto 666 en el puerto 
+                                                   	1666 del server tunelizado y cifrado.
+        #ssh -R " " "				  	fordwareding de puerto remoto contra puerto local.
+
+
+
+	por ejemplo telnet
+	intalar servidor telnet
+   	apt-get install telnetd
+
+	para probar:
+	con esto conseguiremos
+   	ssh -L 6666:ip_serv:23 lsi@ip_serv
+   	-L puerto al que me voy a conectar para redireccionar el trafico. (da igual el puerto)
+
+
+    e)
+          DenyUsers, AllowUsers, DenyGroups y AllowGroups.
+	# AllowUsers admin@172.16.100.25
+
+
+	editamos el archivo "/etc/ssh/sshd_conf"
+   	nano /etc/ssh/sshd_config
+	y añadimos la linea
+  	AllowUsers usuario1 usuario2 usuario3
+	Para que los cambios surtan efectos habrá que reiniciar el servidor:
+   	$ sudo /etc/init.d/ssh restart
+
+con el "/etc/hosts.allow" podemos decir desde que ip va a poder acceder por ssh
+
+
+
+2.
+      http://joseantoniovilar.com/2012/12/certificados-ssl-para-autenticacion-web-en-ubuntu/
+     https://127.0.0.1:443/
+
+
+Los pasos que vamos a seguir…
+
+Creamos nuestra Autoridad Certificadora CA y su certificado.
+Creamos el certificado para nuestro servidor Web. Realizamos la petición de firma, para la Autoridad certificadora (CA). Firmamos los certificados, para nuestro servidor Web, con nuestra CA.
+Configuramos Apache para utilizar los certificados, SSL y virtualhost con el puerto 443/TCP
+Generamos el certificado que vamos a enviar a los clientes ó equipo.
+
+1. Creando la Autoridad Certificadora CA y su certificado.
+
+Una Autoridad Certificadora, lo que hace, es firmar certificados SSL, permitiendo asegurar, que el certificado y el dominio ó site son nuestros.
+
+Nosotros vamos a ser nuestra propia Autoridad Certificadora “privada”. Nuestra CA no será válida para utilizar en internet. Por lo tanto, no vamos a enviar nuestro certificado de seguridad a una entidad certificadora, como por ejemplo Verisign ó la Fábrica Nacional de Monedas y Timbre – FNMT – para que nos lo firme. El certificado lo vamos a firmar, con nuestra propia CA privada; que nos permitirá utilizar el certificado de seguridad, para nuestra Web.
+
+Si no tenemos instalado openssl , lo instalamos con el siguiente comando:
+# sudo apt-get install openssl
+
+Ahora, creamos el directorio CA que va contener los certificados de nuestra entidad certificadora “privada”:
+# cd /etc/ssl
+# mkdir CA
+# mkdir newcerts
+
+Lo siguiente, es crear el archivo “serial“, que establece la numeración de los certificados, y el fichero index.txt, que guarda la base de datos de los certificados:
+# cd CA
+# echo &#039;01&#039; > serial
+# touch index.txt
+
+A partir de este momento, hacemos un backup el fichero openssl.cnf, y editamos un nuevo fichero openssl.cnf:
+# sudo mv openssl.cnf openssl.cnf.old
+# sudo nano /etc/ssl/openssl.cnf
+
+
+Editamos el archivo openssl.cnf con la siguiente información:
+
+[ ca ]
+default_ca = CA_default
+[ CA_default ]
+dir = /etc/ssl  
+serial = $dir/CA/serial
+database = $dir/CA/index.txt
+new_certs_dir = $dir/newcerts    
+certificate = $dir/CA/ca.crt #nombre del archivo del certificado raiz
+private_key = $dir/CA/ca.key #nomre dela clave privada de certificado r$
+default_days = 3650
+default_md = md5
+preserve = no
+email_in_dn = no
+nameopt = default_ca
+certopt = default_ca
+policy = policy_match
+[ policy_match ] # Seccion con las politicas de la emision certificados
+countryName = match #match es obligatorio
+stateOrProvinceName = match
+organizationName = match
+organizationalUnitName = optional
+commonName = supplied
+emailAddress = optional
+[ req ] # Como se deben crear los certificados
+default_bits = 1024 # tamaño de la clave
+default_keyfile = key.pem # nombre por defecto de la clave privada
+default_md = md5 # algoritmo de dispersion
+string_mask = utf8only # cracteres permitios en la mascara de la clave
+distinguished_name = req_distinguished_name # Nombre DN
+ 
+[ req_distinguished_name ] #Los datos propietario CA
+ 
+0.organizationName = Organization Name (company)
+organizationalUnitName = Organizational Unit Name (department, division)
+emailAddress = Email Address
+emailAddress_max = 40
+localityName = Locality Name (city, district)
+stateOrProvinceName = State or Province Name (full name)
+countryName = Country Name (2 letter code)
+countryName_min = 2
+countryName_max = 2
+commonName = Common Name (hostname, IP, or your name)
+commonName_max = 64
+# Valores por defecto
+#------------------------ ------------------------------
+0.organizationName_default =  tu_organizacion
+localityName_default = Madrid
+stateOrProvinceName_default = Madrid
+countryName_default = ES
+emailAddress_default = email@tu_organizacion.com
+[ client ]
+basicConstraints = critical,CA:FALSE
+extendedKeyUsage = clientAuth
+
+
+
+
+Lo siguiente, es crear el certificado y la clave privada de nuestra Autoridad Certificadora “privada“:
+# cd /etc/ssl/CA
+# sudo openssl req -x509 -newkey rsa:2048 -days 3650 -keyout ca.key -out ca.crt -config /etc/ssl/openssl.cnf
+
+
+Para comprobar le contenido:
+# sudo openssl x509 -in ca.crt -text
+
+
+2. Creamos el cetificado SSL para nuestro servidor Web
+
+Ahora, que tenemos creada nuestra Autoridad Certificadora; ya podemos crear el certificado y la petición de firma para la CA de nuestro servidor Web:
+# sudo openssl req -newkey rsa:1024 -nodes -out tu_servidor.csr -keyout tu_servidor.key
+
+
+Nos pide la contraseña, y los siguientes datos:
+
+Organization Name (company) [ideas3k]: tu_organizacion
+Organizational Unit Name (department, division) []:
+Email Address [info@tu_organizacion.com]:
+Locality Name (city, district) [Madrid]:
+State or Province Name (full name) [Madrid]:
+Country Name (2 letter code) [ES]:ES
+Common Name (hostname, IP, or your name) []: www.tu_servidor.com #FQDN
+
+
+En este momento procedemos a firmarlo con nuestra CA “privada”:
+# sudo openssl ca -batch -config /etc/ssl/openssl.cnf -notext -in tu_servidor.csr -out tu_servidor.crt
+
+
+El anterior comando nos muestra la siguiente información, si todo ha ido bien:
+
+Using configuration from /etc/ssl/openssl.cnf
+Enter pass phrase for /etc/ssl/CA/ca.key:
+Check that the request matches the signature
+Signature ok
+The Subject&#039;s Distinguished Name is as follows
+organizationName      :ASN.1 12:&#039;ideas3k&#039;
+localityName          :ASN.1 12:&#039;Madrid&#039;
+stateOrProvinceName   :ASN.1 12:&#039;Madrid&#039;
+countryName           :;
+commonName            :ASN.1 12:&#039;www.tu_servidor.com&#039;
+Certificate is to be certified until Nov 24 19:12:08 2022 GMT (3650 days)
+ 
+Write out database with 1 new entries
+Data Base Updated
+
+
+Puedes comprobar el contenido, con este comando:
+# openssl x509 -noout -text -in tu_servidor.crt
+
+
+
+3. Configuramos Apache para utilizar SSL
+
+Ahora, para poder utilizar SSL y los certificados, tienes que tener activo el puerto 443/TCP y configurar NameVirtualHost *:443.
+Habilitamos el modulo SSL:
+# sudo a2enmod ssl
+
+
+Nos aseguramos que este descomentado la entrada: Listen 443, en el fichero /etc/apache2/ports.conf:
+
+<IfModule mod_ssl.c>
+# If you add NameVirtualHost *:443 here, you will also have to change
+# the VirtualHost statement in /etc/apache2/sites-available/default-ssl
+# to <VirtualHost *:443>
+# Server Name Indication for SSL named virtual hosts is currently not
+# supported by MSIE on Windows XP.
+Listen 443
+</IfModule>
+
+
+
+El siguiente paso, es copiar los certificados anteriores, a un lugar del tu servidor We, para poder utilizarlos.
+Ahora, editamos el archivo /etc/apache2/sites-enabled/tu_servidor
+
+
+<VirtualHost *:443>
+        ServerAdmin webmaster@qtu_servidor.com
+  ServerName  www.tu_servidor.com
+  ServerAlias tu_servidor.com
+  # Ficheros Index
+  DirectoryIndex index.html index.php
+  DocumentRoot /srv/www/tu_servidor.com/ssl
+   # Configuracion SSL
+    SSLEngine on
+    #Configuración de seguridad. Desactivo SSLv2
+    SSLProtocol all -SSLv2
+    SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW
+    SSLHonorCipherOrder On
+    SSLOptions +StrictRequire
+    SSLCertificateFile /srv/www/tu_servidor.com/certs/tu-servidor.crt
+    SSLCertificateKeyFile /srv/www/tu_servidor.com/certs/tu_servidor.key
+    <Directory />
+        SSLRequireSSL
+    </Directory>
+  # Ficheros Log
+  LogLevel warn
+  ErrorLog  /srv/www/tu_servidor.com//log/error.log
+  CustomLog /srv/www/tu_servidor.com/log/access.log combined
+</VirtualHost>
+
+
+
+Reiniciamos el servidor apache e intentamos conectarnos por https://tu_servidor.com:
+
+# sudo service apache2 reload
+
+
+Si accedes a tu dominio con https te aparece la información: “El certificado de seguridad del sitio no es de confianza“. Si sigues adelante veras que la conexión esta cifrada y la identidad no es reconocida.
+
+Ahora, lo que toca es volver a editar /etc/apache2/sites-enabled/tu_servidor para permitir la autenticación de usuario por certificado:
+
+
+<VirtualHost *:443>
+        ServerAdmin webmaster@qtu_servidor.com
+  ServerName  www.tu_servidor.com
+  ServerAlias tu_servidor.com
+  # Ficheros Index
+  DirectoryIndex index.html index.php
+  DocumentRoot /srv/www/tu_servidor.com/ssl
+   # Configuracion SSL
+    SSLEngine on
+    #Configuración de seguridad. Desactivado SSLv2
+    SSLProtocol all -SSLv2
+    SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW
+    SSLHonorCipherOrder On
+    SSLOptions +StrictRequire
+    SSLCertificateFile /srv/www/tu_servidor.com/certs/tu-servidor.crt
+    SSLCertificateKeyFile /srv/www/tu_servidor.com/certs/tu_servidor.key
+    <Directory />
+        SSLRequireSSL
+   # El cliente debe autenticarse obligatoriamente con el certificado
+     SSLVerifyClient require
+   # Nivel máximo de profundidad (según infraestructura actual, 2)
+     SSLVerifyDepth 2
+     AllowOverride None
+     Order allow,deny
+    allow from all
+    </Directory>
+  # Ficheros Log
+  LogLevel warn
+  ErrorLog  /srv/www/tu_servidor.com//log/error.log
+  CustomLog /srv/www/tu_servidor.com/log/access.log combined
+</VirtualHost>
+
+Reinicimos el servidor apache.
+# ; html-script: false ]sudo service apache2 reload
+
+
+
+4. Generado el certificado para el usuario
+
+Ahora intentamos conectarnos por https://tu_servidor.com. Nos pide el certificado de usuario para poder acceder. No lo tenemos. Es el momento crear el certificado para el usuario:
+
+# ; html-script: false ]sudo openssl req -newkey rsa:1024 -nodes -out tu_cliente.csr -keyout tu_cliente.key
+Cuando nos pida el “commonName” le ponemos el nombre del usuario.
+
+
+Ahora, lo firmamos:
+# sudo openssl ca -batch -config /etc/ssl/openssl.cnf -notext -in tucliente.csr -out tu_cleinte.crt -extensions client
+
+
+Y, por ultimo, creamos el certificado pk12 para el usuario
+# sudo openssl pkcs12 -export -inkey tu_cliente.key -in tu_cliente.crt -out tu_cleinte.p12
+
+Nos pide una contraseña para proteger el certificado. Esta contraseña, se la pide al usuario, cuando importe el certificado, en el browser. Ya podemos enviarselo al usuario para que se pueda conectar a nuestra Web.
+
+
+
+
+usuario: ecfic
+contraseña: debian_lsi
+
+
+
+
+
+3. Tomando como base de trabajo el openVPN deberá configurar una VPN entre dos
+equipos virtuales del laboratorio que garanticen la confidencialidad entre sus
+comunicaciones.
+
+# apt-get install openvpn
+
+Generamos la clave en el servidor, que utilizaremos para encriptar la conexion
+utilizando criptografia simetrica. La guardamos en /etc/openvpn:
+   # openvpn --genkey --secret /etc/openvpn/clave.key
+
+La copiamos tambien al cliente, usando scp (para evitar que un MITM):
+   # scp debian@192.168.0.2:/etc/openvpn/clave.key /etc/openvpn/
+
+En el servidor creamos el fichero /etc/openvpn/tun0.conf con el siguiente contenido:
+   nano /etc/openvpn/tun0.conf
+      dev tun0
+      ifconfig 10.0.4.1 10.0.4.2
+      secret /etc/openvpn/clave.key
+
+Las direcciones 10.0.4.1 y 10.0.4.2 son las direcciones virtuales de servidor y
+cliente, podemos coger las que queramos (cuidado que no coincidan con las de
+otra interfaz que tengamos en uso). tun0 es el nombre de la interfaz virtual.
+
+En el cliente creamos el mismo fichero con el siguiente contenido:
+   remote IP_SERVIDOR
+   dev tun0
+   ifconfig 10.0.4.2 10.0.4.1
+   secret /etc/openvpn/clave.key
+
+
+Ahora ejecutamos, tanto en el servidor como en el cliente:
+   # openvpn --config /etc/openvpn/tun0.conf
+
+
+Si ahora hacemos un ifconfig veremos que se ha creado la interfaz tun0. Se ha
+creado una VPN entre las dos maquinas que usa un tunel cifrado. Las IPs de la
+VPN son 10.0.4.1 para el servidor y 10.0.4.2 para el cliente.
+
+Para probar: ping y una de las IP
+
+
+
+
+
+
