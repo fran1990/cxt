@@ -2,3 +2,5 @@ Este script lee una lista de usuarios de un fichero "usuarios.txt" y crea unas c
 
 El script busca imagenes en la carpeta de imagenes de muestra y elige una aleatoria para cada usuario
 y la guarda en una carpeta personal de imagenes para cada usuario que previamente creamos.
+
+El script ahora también busca canciones en la carpeta de musica de meustra y elige una aleatoria para cada usuario y la guarda en una carpeta persona de musica para cada usuario que previamente creamos.
