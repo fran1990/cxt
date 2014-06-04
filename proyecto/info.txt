@@ -3,4 +3,4 @@ Este script lee una lista de usuarios de un fichero "usuarios.txt" y crea unas c
 
 Creacion de usuarios
 
-
+Creación de carpetas home para cada usuario

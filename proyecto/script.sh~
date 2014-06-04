@@ -10,8 +10,7 @@ mkdir musica 2>/dev/null
 
 for user in $USERS
 do
-	useradd $user 2>/dev/null
-	mkdir /home/$user 2>/dev/null
+	useradd $user
 done
 
 
