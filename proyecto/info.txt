@@ -1,0 +1,1 @@
+Este script lee una lista de usuarios de un fichero "usuarios.txt" y crea unas carpetas de imagenes y música inicialmente vacías.
